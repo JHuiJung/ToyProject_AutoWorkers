@@ -56,8 +56,14 @@ public class Rs_Base : MonoBehaviour
 
     public void return_Key()
     {
-        keys += 1;
-        keys %= 6;
+        if(keys + 1 >= 5)
+        {
+            keys = 5;
+        }
+        else
+        {
+            keys += 1;
+        }
     }
     
 }

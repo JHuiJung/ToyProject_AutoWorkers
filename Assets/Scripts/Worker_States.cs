@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Worker_States
 {
-    
+
     public class GoWork : Worker_StateBase
     {
         //일하는 곳으로가는 상태
@@ -39,9 +39,10 @@ namespace Worker_States
                 n_time += 1f;
                 if (wc.attachedObj != null)
                 {
-                    
-                    if (wc.bag.IsFull )
+
+                    if (wc.bag.IsFull)
                     {
+
                         wc.Change_State(new BackHome());
                     }
                     else
@@ -56,77 +57,115 @@ namespace Worker_States
                             {
                                 wc.attachedObj.GetComponent<Rs_Base>().resource_Cnt -= 1;
                                 wc.bag.AddRs(1);
+                                wc.stress += Random.Range(1, 10);
+                                if (wc.stress >= 80) { wc.Change_State(new GoRest()); }
                             }
-                            
+
                         }
-                        
+
                     }
 
 
                 }
 
             }
-            if(target == null)
+            if (target == null)
             {
                 target = Rs_Manager.Inst.GetNearObj(wc.GetPosition());
-                if(target != null)
+                if (target != null)
                 {
                     wc.MoveAgent(target.GetComponent<Transform>().position);
                     target.GetComponent<Rs_Base>().getKey();
                 }
-                
+
             }
-            
+
         }
 
         public override void Exit(WorkerController wc)
         {
-            wc.attachedObj.GetComponent<Rs_Base>().return_Key();
-        }
+            target.GetComponent<Rs_Base>().return_Key();
 
 
+        } 
     }
 
-    public class BackHome : Worker_StateBase
-    {
-        float time = 0f;
-        float n_time = 0f;
-        public override void Enter(WorkerController wc)
+        public class BackHome : Worker_StateBase
         {
-            wc.MoveAgent(GameObject.FindGameObjectWithTag("Nexus").GetComponent<Transform>().position);
-        }
-
-        public override void Excute(WorkerController wc)
-        {
-            time += Time.deltaTime;
-            if (time >= 1f)
+            float time = 0f;
+            float n_time = 0f;
+            public override void Enter(WorkerController wc)
             {
-                time = 0f;
-                n_time += 1f;
-                if (wc.attachedObj != null)
-                {
-                    if (wc.bag.IsEmpty)
-                    {
-                        wc.Change_State(new GoWork());
-                    }
-                    else
-                    {
-                        if(wc.attachedObj.tag == "Nexus")
-                        {
-                            
-                            wc.attachedObj.GetComponent<Worker_Bag>().AddRs(wc.bag.DropRs(1));
-                        }
-                        
-                    }
-                }
+                wc.MoveAgent(GameObject.FindGameObjectWithTag("Nexus").GetComponent<Transform>().position);
+            }
 
+            public override void Excute(WorkerController wc)
+            {
+                time += Time.deltaTime;
+                if (time >= 1f)
+                {
+                    time = 0f;
+                    n_time += 1f;
+                    if (wc.attachedObj != null)
+                    {
+                        if (wc.bag.IsEmpty)
+                        {
+                            wc.Change_State(new GoWork());
+                        }
+                        else
+                        {
+                            if (wc.attachedObj.tag == "Nexus")
+                            {
+
+                                wc.attachedObj.GetComponent<Worker_Bag>().AddRs(wc.bag.DropRs(1));
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+            public override void Exit(WorkerController wc)
+            {
+                Debug.Log("일하러 가자");
             }
         }
 
-        public override void Exit(WorkerController wc)
+        public class GoRest : Worker_StateBase
         {
-            Debug.Log("일하러 가자");
+            float time = 0f;
+            float n_time = 0f;
+            public override void Enter(WorkerController wc)
+            {
+                GameObject re = GameObject.FindGameObjectWithTag("Rest");
+                wc.MoveAgent(re.GetComponent<Transform>().position);
+            }
+
+            public override void Excute(WorkerController wc)
+            {
+                time += Time.deltaTime;
+                if (time >= 1f)
+                {
+                    time = 0f;
+                    n_time += 1f;
+                    if (wc.attachedObj != null && wc.attachedObj.tag == "Rest")
+                    {
+                        wc.stress -= Random.Range(1, 10);
+                        if (wc.stress <= 20)
+                        {
+                            wc.Change_State(new GoWork());
+                        }
+                    }
+
+                }
+            }
+
+            public override void Exit(WorkerController wc)
+            {
+                Debug.Log("잘 쉬었당");
+            }
         }
     }
-}
+
 
