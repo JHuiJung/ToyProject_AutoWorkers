@@ -8,9 +8,7 @@ public class State_Test : Worker_StateBase
     float n_time = 0f;
     public override void Enter(WorkerController wc)
     {
-        Debug.Log(wc.stress);
-        Debug.Log(wc.state);
-        Debug.Log(wc.hungry);
+       
     }
 
     public override void Excute(WorkerController wc)
@@ -20,14 +18,16 @@ public class State_Test : Worker_StateBase
         {
             time = 0f;
             n_time += 1f;
-            if(n_time >= 3f)
+            wc.bag.AddRs(1);
+            Debug.Log(wc.bag.RsAmount);
+            if(n_time >= 8f)
             {
                 wc.Change_State(new State_Test());
             }
         }
     }
 
-    public override void Exit()
+    public override void Exit(WorkerController wc)
     {
         
     }

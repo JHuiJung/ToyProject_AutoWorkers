@@ -9,6 +9,6 @@ public abstract class Worker_StateBase
 
     public abstract void Excute(WorkerController wc);
 
-    public abstract void Exit();
+    public abstract void Exit(WorkerController wc);
 
 }
